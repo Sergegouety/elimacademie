@@ -10,7 +10,7 @@
     <meta content="Inscription | Elim Academie - Admin & Dashboard" name="description" />
     <meta content="Themesbrand" name="author" />
     <!-- App favicon -->
-    <link rel="shortcut icon" href="{{asset('assets/images/favicon.ico')}}">
+    <link rel="shortcut icon" href="{{asset('assets/images/favicon_academie.jpeg')}}">
 
     <!-- Layout config Js -->
     <script src="{{asset('assets/js/layout.js')}}"></script>
@@ -82,7 +82,6 @@
 
             <div class="page-content">
                 <div class="container-fluid" style="background-image: {{asset('assets/images/bg-d.png')}}">
-
                 </div>
                 
                 <div class="container-fluid">
@@ -360,7 +359,7 @@
                                                                     <div class="form-check">
                                                                         <input type="radio" class="form-check-input" value="2"
                                                                             id="f_fret" name="formation">
-                                                                        <label class="form-check-label" for="f_fret">SAGENT DE FRET</label>
+                                                                        <label class="form-check-label" for="f_fret">AGENT DE FRET</label>
                                                                     </div>
 
                                                                     <div class="form-check">
@@ -374,8 +373,6 @@
                                                                             id="f_billet" name="formation">
                                                                         <label class="form-check-label" for="f_billet">AGENT DE BILLETTERIE DU TOURISME ET DE L'HOTELLERIE</label>
                                                                     </div>
-
-                                                                
                                                                 </div>
 
                                                                 <hr class="my-4 text-muted">
@@ -397,8 +394,6 @@
                                                             </div>
                                                         </div>
                                                         <!-- end tab pane -->
-                                                        
-                                    
                                                     </div>
                                                     <!-- end tab content -->
                                                 </div>
@@ -449,8 +444,6 @@
             </div>
         </div>
     </div>
-
-    
 
     <!-- JAVASCRIPT -->
     <script src="{{asset('assets/libs/bootstrap/js/bootstrap.bundle.min.js')}}"></script>

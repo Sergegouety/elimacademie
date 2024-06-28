@@ -1,8 +1,15 @@
 <?php
 
-use App\Http\Controllers\InscriptionController;
-use App\Http\Controllers\UserController;
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\NoteController;
+use App\Http\Controllers\UserController;
+use App\Http\Controllers\ModuleController;
+use App\Http\Controllers\EtudiantController;
+use App\Http\Controllers\PointageController;
+use App\Http\Controllers\ClassroomController;
+use App\Http\Controllers\FormationController;
+use App\Http\Controllers\EvaluationController;
+use App\Http\Controllers\InscriptionController;
 
 
 Route::get('/', [InscriptionController::class, 'index'])->name('preinscription');
@@ -14,6 +21,20 @@ Route::post('/setup', [UserController::class, 'password_setup'])->name('password
 Route::get('/dashboard', [UserController::class, 'dashboard'])->name('dashboard');
 Route::get('/professor/dashboard', [UserController::class, 'professor_dashboard'])->name('professor.dashboard');
 Route::get('/student/dashboard', [UserController::class, 'student_dashboard'])->name('student.dashboard');
+
+Route::resource('etudiants', EtudiantController::class);
+
+Route::resource('classrooms', ClassroomController::class);
+
+Route::resource('formations', FormationController::class);
+
+Route::resource('modules', ModuleController::class);
+
+Route::resource('notes', NoteController::class);
+
+Route::resource('evaluations', EvaluationController::class);
+
+Route::resource('pointages', PointageController::class);
 
 Route::resource('user', UserController::class);
 Route::prefix('utilisateur')->name('users.')->group(function () {
