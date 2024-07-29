@@ -2,20 +2,22 @@
 
 namespace App\Http\Controllers;
 
-use App\Repositories\EtudiantRepositoryInterface;
-use App\Repositories\UserRepositoryInterface;
-use App\Repositories\FormationRepositoryInterface;
-
 use Exception;
-use Illuminate\Http\Request;
-use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Redirect;
-use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Validator;
-use Illuminate\Support\Facades\Session;
 use Carbon\Carbon;
+use App\Models\Role;
 
 use App\Models\User;
+use App\Models\Permission;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Session;
+use Illuminate\Support\Facades\Redirect;
+use Illuminate\Support\Facades\Validator;
+
+use App\Repositories\UserRepositoryInterface;
+use App\Repositories\EtudiantRepositoryInterface;
+use App\Repositories\FormationRepositoryInterface;
 
 class UserController extends Controller
 {
@@ -68,8 +70,18 @@ class UserController extends Controller
                  return view('frontoffice.password_setup',compact('user'));
 
                 } 
-
-                return redirect()->route('dashboard',compact('user'));
+                    // Redirection en fonction du rôle
+                    if ($user->hasRole('admin')) {
+                    return redirect()->route('dashboard');
+                    } elseif ($user->hasRole('comptable')) {
+                    return redirect()->route('dashboard');
+                    } elseif ($user->hasRole('professeur')) {
+                    return redirect()->route('professor.dashboard');
+                    } elseif ($user->hasRole('etudiant')) {
+                    return redirect()->route('student.dashboard');
+                    } else {
+                    return redirect()->route('dashboard');
+                    }
 
             } else {
                 Session::flash('error', 'Email/Telephone ou mot de passe incorrect');
@@ -77,6 +89,15 @@ class UserController extends Controller
             }
         }
 
+    }
+
+    public function doLogout()
+    {
+       Auth::logout(); 
+       Session::flush();
+       Session::flash('success','Vous avez bien été déconnecté !');
+
+      return redirect()->route('login.view');
     }
 
     public function password_setup(Request $request){
@@ -93,9 +114,106 @@ class UserController extends Controller
     // Exemple de méthode pour afficher une liste d'utilisateurs
     public function index()
     {
+
+        $permissions = Permission::get();
+        $roles = Role::get();
+        $users = User::paginate(30);
         // Votre logique ici
-        return view('users.index');
+        return view('backoffice.users.index',compact('users','permissions','roles'));
     }
+
+    public function getRoles()
+    {
+        $permission_list = Permission::get();
+        $role_list = Role::with('permissions')->paginate(30);
+
+        return view('backoffice.users.roles' ,compact('permission_list', 'role_list'));
+    }
+
+    public function getRoleForm($roleId = null)
+    {
+
+        $role = Role::find($roleId);
+
+        $permission_list = Permission::get();
+
+        return view('backoffice.users.role_form', compact('permission_list', 'role'));
+    }
+     //TODO extract role and permission codes 
+     public function store_role(Request $req)
+     {
+
+       
+         $roleId = $req->get('roleId');
+         $permission_list = $req->get('checkbox_permission');
+         $nom = $req->get('nom');
+         $statut = $req->get('statut');
+ 
+         if ($roleId) {  //si le role existe dejà 
+ 
+             $affected = DB::table('roles')->where('id', $roleId)->update(['name' => $nom, 'statut' => $statut]);
+ 
+             $role = Role::find($roleId);
+ 
+             if ($permission_list) {
+                 $role->syncPermissions([]);  // Supprimer toutes les permissions associées au rôle
+                 $permissions = Permission::whereIn('id', $permission_list)->get();
+ 
+                 foreach ($permissions as $permission) {  // associer les nouvelles permissions
+ 
+                     $role->givePermissionTo($permission);
+                 }
+             } else {
+                 $role->syncPermissions([]);  // Supprimer toutes les permissions associées au rôle
+             }
+
+             return Redirect::route('backoffice.users.roles')->with('success', "Rôle modifié avec succès");
+         } else {
+             //sinon si le role n'existe pas
+            // dd( $req);
+              try {
+ 
+                 $role = Role::create([
+                     'name' => $req->get('nom'),
+                     'guard_name' => 'web',
+                 ]); //creation du role
+ 
+                 if ($permission_list !== null) {
+ 
+                     // Récupérez les objets de permission correspondant aux valeurs cochées
+                     $permissions = Permission::whereIn('id', $permission_list)->get();
+ 
+                     // Attachez chaque permission au rôle
+                     foreach ($permissions as $permission) {
+                         $role->givePermissionTo($permission);
+                     }
+                 }
+             } catch (\Exception $e) {
+                 return Redirect::back()->with('error', $e);
+             }
+ 
+             return Redirect::route('users.roles')->with('success', "Rôle ajouté avec succès");
+         }
+     }
+ 
+     public function store_permission(Request $req)
+     {
+ 
+         $permission = Permission::create([
+             'name' => $req->get('nom'),
+             'guard_name' => 'web',
+         ]);
+ 
+         return Redirect::back()->with('success', "Permission ajoutée avec succès");
+     }
+
+    public function getPermissions()
+    {
+        // Votre logique ici
+        $permission_list = Permission::paginate(30);
+        return view('backoffice.users.permissions',compact('permission_list'));
+    }
+    
 
     // Exemple de méthode pour afficher un utilisateur spécifique
     public function show($id)
@@ -107,7 +225,9 @@ class UserController extends Controller
     // Exemple de méthode pour créer un nouvel utilisateur
     public function create()
     {
-        return view('users.create');
+        $permissions = Permission::get();
+        $roles = Role::get();
+        return view('backoffice.users.create',compact('roles','permissions'));
     }
 
     // Exemple de méthode pour enregistrer un nouvel utilisateur
@@ -141,7 +261,7 @@ class UserController extends Controller
             DB::beginTransaction();
 
         $user = $this->userRepository->create($uerdata);
-
+        $user->assignRole('etudiant');
         $etudiantdata['user_id'] = $user->id ?? null;
         $etudiant = $this->etudiantRepository->create($etudiantdata);
 
@@ -157,6 +277,38 @@ class UserController extends Controller
         // Votre logique ici
         // Validation et enregistrement des données
     }
+
+     // Exemple de méthode pour enregistrer un nouvel utilisateur
+     public function userStore(Request $request)
+     {
+         $requestData = $request->all();
+         //dd( $requestData);
+ 
+         $uerdata = [];
+         $uerdata['nom'] = $requestData['nom'] ?? null;
+         $uerdata['prenoms'] = $requestData['prenoms'] ?? null;
+         $uerdata['sexe_id'] = $requestData['sexe_id'] ?? null;
+         $uerdata['telephone'] = $requestData['telephone'] ?? null;
+         $uerdata['email'] = $requestData['email'] ?? null;
+         $uerdata['password']  =  bcrypt($requestData['password']);
+ 
+         try {
+             DB::beginTransaction();
+ 
+         $user = $this->userRepository->create($uerdata);
+         // Assign roles and permissions
+         $user->assignRole($request->role_name);
+         $user->givePermissionTo($request->checkbox_permission ?? []);
+         DB::commit();
+         return Redirect::route('user.index')->with('success', "Utilisateur créé avec succès");
+     } catch (Exception $e) {
+         DB::rollBack();
+         return Redirect::back()->with('error', $e->getMessage())->withInput($request->all());
+     }
+ 
+         // Votre logique ici
+         // Validation et enregistrement des données
+     }
 
     // Exemple de méthode pour éditer un utilisateur existant
     public function edit($id)

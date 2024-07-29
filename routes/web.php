@@ -17,6 +17,7 @@ Route::get('/confirm', [InscriptionController::class, 'confirm'])->name('preinsc
 
 Route::get('/login', [UserController::class, 'loginview'])->name('login.view'); 
 Route::post('/login', [UserController::class, 'login'])->name('login.home');
+Route::get('/logout', [UserController::class , 'doLogout'])->name('logout');
 Route::post('/setup', [UserController::class, 'password_setup'])->name('password.setup'); 
 Route::get('/dashboard', [UserController::class, 'dashboard'])->name('dashboard');
 Route::get('/professor/dashboard', [UserController::class, 'professor_dashboard'])->name('professor.dashboard');
@@ -42,7 +43,7 @@ Route::prefix('utilisateur')->name('users.')->group(function () {
 
     Route::get('/profile/{id}', [UserController::class, 'getUsersById'])->name('profile');
     Route::get('/profile_setting/{id}', [UserController::class, 'setUsersById'])->name('profile_set');
-    Route::post('/store',[UserController::class , 'store'])->name('store');
+    Route::post('/store',[UserController::class , 'userStore'])->name('store');
     Route::get('/edit/{user}',[UserController::class , 'edit'])->name('edit');
     Route::put('/{user}/update',[UserController::class , 'update'])->name('update');
     Route::delete('/destroy/{id}', [UserController::class, 'destroy'])->name('destroy');

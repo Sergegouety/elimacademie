@@ -38,7 +38,7 @@
             <!-- LOGO -->
             <div class="navbar-brand-box">
                 <!-- Dark Logo-->
-                <a href="index.html" class="logo logo-dark">
+                <a href="#" class="logo logo-dark">
                     <span class="logo-sm">
                         <img src="{{asset('assets/images/logo_academie.png')}}" alt="" height="150">
                     </span>
@@ -47,7 +47,7 @@
                     </span>
                 </a>
                 <!-- Light Logo-->
-                <a href="index.html" class="logo logo-light">
+                <a href="#" class="logo logo-light">
                     <span class="logo-sm">
                         <img src="{{asset('assets/images/logo_academie.png')}}" alt="" height="150">
                     </span>
@@ -79,10 +79,12 @@
         <!-- Start right Content here -->
         <!-- ============================================================== -->
         <div class="main-content">
+            <div style="text-align: center;">
+                <img src="{{asset('assets/images/logo_academie.png')}}" alt="" height="150" style="border-radius: 50%;">
+            </div>
 
             <div class="page-content">
-                <div class="container-fluid" style="background-image: {{asset('assets/images/bg-d.png')}}">
-                </div>
+                
                 
                 <div class="container-fluid">
 

@@ -50,16 +50,16 @@
                                             <div class="collapse menu-dropdown" id="sidebarCalendar">
                                                 <ul class="nav nav-sm flex-column">
                                                     <li class="nav-item">
-                                                        <a href="apps-calendar.html" class="nav-link" data-key="t-main-calender">Nouveau </a>
+                                                        <a href="{{route('user.create')}}" class="nav-link" data-key="t-main-calender">Nouveau </a>
                                                     </li>
                                                     <li class="nav-item">
-                                                        <a href="apps-calendar-month-grid.html" class="nav-link" data-key="t-month-grid"> Liste </a>
+                                                        <a href="{{route('user.index')}}" class="nav-link" data-key="t-month-grid"> Liste </a>
                                                     </li>
                                                     <li class="nav-item">
-                                                        <a href="apps-calendar-month-grid.html" class="nav-link" data-key="t-month-grid"> Rôles </a>
+                                                        <a href="{{route('users.roles')}}" class="nav-link" data-key="t-month-grid"> Rôles </a>
                                                     </li>
                                                     <li class="nav-item">
-                                                        <a href="apps-calendar-month-grid.html" class="nav-link" data-key="t-month-grid"> Permissions </a>
+                                                        <a href="{{route('users.permissions')}}" class="nav-link" data-key="t-month-grid"> Permissions </a>
                                                     </li>
                                                 </ul>
                                             </div>
